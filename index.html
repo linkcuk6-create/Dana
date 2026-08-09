@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dompet Digital</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f6f9; display: flex; justify-content: center; padding: 20px; }
+        .app-card { background: white; width: 100%; max-width: 380px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #108ee9; color: white; padding: 24px 20px; text-align: center; }
+        .header h2 { font-size: 16px; font-weight: normal; opacity: 0.9; }
+        .balance { font-size: 32px; font-weight: bold; margin-top: 8px; }
+        .actions { display: flex; justify-content: space-around; padding: 20px; background: #fff; border-bottom: 8px solid #f4f6f9; }
+        .btn-action { border: none; background: #eaf4ff; color: #108ee9; padding: 12px 16px; border-radius: 12px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 5px; }
+        .btn-action:hover { background: #d0e6ff; }
+        .content { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+        .btn-submit { width: 100%; background: #108ee9; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .history { margin-top: 20px; }
+        .history h3 { font-size: 14px; color: #777; margin-bottom: 10px; }
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .plus { color: green; font-weight: bold; }
+        .minus { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="header">
+        <h2>Saldo Dompet Digital</h2>
+        <div class="balance" id="saldoDisplay">Rp 0</div>
+    </div>
+
+    <div class="actions">
+        <button class="btn-action" onclick="showForm('topup')">+ Top Up</button>
+        <button class="btn-action" onclick="showForm('kirim')">↑ Kirim</button>
+    </div>
+
+    <div class="content">
+        <div id="formContainer" class="form-group">
+            <label id="formTitle">Jumlah Top Up (Rp)</label>
+            <input type="number" id="inputNominal" placeholder="Masukkan nominal...">
+            <button class="btn-submit" onclick="prosesTransaksi()" style="margin-top: 10px;">Proses</button>
+        </div>
+
+        <div class="history">
+            <h3>Riwayat Transaksi</h3>
+            <div id="historyList">
+                <p style="color: #aaa; font-size: 12px;">Belum ada transaksi.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let saldo = 0;
+    let mode = 'topup';
+
+    function updateSaldoDisplay() {
+        document.getElementById('saldoDisplay').innerText = 'Rp ' + saldo.toLocaleString('id-ID');
+    }
+
+    function showForm(type) {
+        mode = type;
+        const title = document.getElementById('formTitle');
+        if (type === 'topup') {
+            title.innerText = 'Jumlah Top Up (Rp)';
+        } else {
+            title.innerText = 'Jumlah Kirim Uang (Rp)';
+        }
+    }
+
+    function prosesTransaksi() {
+        const input = document.getElementById('inputNominal');
+        const nominal = parseInt(input.value);
+
+        if (isNaN(nominal) || nominal <= 0) {
+            alert('Masukkan nominal yang valid!');
+            return;
+        }
+
+        const historyList = document.getElementById('historyList');
+        if (historyList.querySelector('p')) {
+            historyList.innerHTML = '';
+        }
+
+        const item = document.createElement('div');
+        item.className = 'history-item';
+
+        if (mode === 'topup') {
+            saldo += nominal;
+            item.innerHTML = `<span>Top Up Saldo</span><span class="plus">+Rp ${nominal.toLocaleString('id-ID')}</span>`;
+        } else {
+            if (nominal > saldo) {
+                alert('Saldo tidak cukup!');
+                return;
+            }
+            saldo -= nominal;
+            item.innerHTML = `<span>Kirim Uang</span><span class="minus">-Rp ${nominal.toLocaleString('id-ID')}</span>`;
+        }
+
+        historyList.prepend(item);
+        updateSaldoDisplay();
+        input.value = '';
+    }
+</script>
+
+</body>
+</html>
